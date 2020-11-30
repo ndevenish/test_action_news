@@ -31,12 +31,22 @@ jobs:
       - name: Rename placeholder newsfragments
         run: |
           if ls newsfragments/XXX.* 1> /dev/null 2>&1; then
+            # Setup SSH access
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            ssh-agent -a /tmp/ssh_agent.sock > /dev/null
+            ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+            # Now setup git
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             HEAD_REPO="${{github.event.pull_request.head.repo.full_name}}"
             HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
             message=""
-            git remote add fork https://x-access-token:${GITHUB_TOKEN}@github.com/$HEAD_REPO.git
+            git remote add fork git@github.com:$HEAD_REPO.git
+            echo "Check the connection"
+            ssh -v git@github.com || true
+            echo "done"
+            #https://x-access-token:${GITHUB_TOKEN}@github.com/$HEAD_REPO.git
             for fragment in newsfragments/XXX.*; do
               target_file="$(echo "${fragment}" | sed "s/XXX/${{github.event.number}}/")"
               git mv $fragment $target_file
