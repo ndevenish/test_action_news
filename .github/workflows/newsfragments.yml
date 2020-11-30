@@ -29,13 +29,15 @@ jobs:
             echo "✅  Newsfragment entry present"
           fi
       - name: Rename placeholder newsfragments
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           set -x
-          if ls newsfragments/XXX.* 1> /dev/null 2>&1; then
+i          if ls newsfragments/XXX.* 1> /dev/null 2>&1; then
             # Setup SSH access
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
-            ssh-agent -a /tmp/ssh_agent.sock > /dev/null
+            ssh-agent -a ${SSH_AUTH_SOCK} > /dev/null
             ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
             # Now setup git
             git config user.name "github-actions[bot]"
