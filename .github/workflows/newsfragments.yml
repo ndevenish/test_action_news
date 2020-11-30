@@ -18,6 +18,7 @@ jobs:
       - name: Added a newsfragment
         run: |
           set -x
+          echo "on main"
           git fetch --unshallow
           git log HEAD -n 1
           git log --oneline --decorate
