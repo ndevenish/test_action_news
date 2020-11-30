@@ -27,7 +27,6 @@ jobs:
             exit 1
           else
             echo "✅  Newsfragment entry present"
-            find .
           fi
       - name: Rename placeholder newsfragments
         run: |
