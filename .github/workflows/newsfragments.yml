@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+        # with:
+        #   ref: ${{ github.event.pull_request.head.sha }}
       - name: Added a newsfragment
         run: |
           set -x
