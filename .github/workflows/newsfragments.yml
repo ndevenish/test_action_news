@@ -13,8 +13,26 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+        # with:
+        #   ref: ${{ github.event.pull_request.head.sha }}
+      - name: Added a newsfragment
+        run: |
+          set -x
+          echo "on main"
+          git fetch --unshallow
+          git log HEAD -n 1
+          git log --oneline --decorate
+          cat ${GITHUB_EVENT_PATH}
+          # echo "_$(git diff ${{ github.event.pull_request.base.sha }} --name-only -- newsfragments/)_"
+          treediff="$(git diff-tree  HEAD ${{ github.event.pull_request.base.sha }} -- newsfragments/)"
+          echo "_${treediff}_"
+          if [[ -z "${treediff}" ]]; then
+            echo "::error ::PR Branch is missing a newsfragment. Please add one with a number or named XXX.<type>."
+            exit 1
+          else
+            echo "✅  Newsfragment entry present"
+            find .
+          fi
       - name: Rename placeholder newsfragments
         run: |
           set -x
@@ -23,6 +41,7 @@ jobs:
             git config user.email "noreply@github.com"
             HEAD_REPO="${{github.event.pull_request.head.repo.full_name}}"
             HEAD_BRANCH="${{github.event.pull_request.head.ref}}"
+            # git log --oneline --decorate
             git remote add fork https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/$HEAD_REPO.git
             git fetch fork
             # # Rewind this to the head of the PR instead of the post-PR merge point
@@ -33,29 +52,14 @@ jobs:
               git mv $fragment $target_file
               git add $target_file
             done
-            # git log --oneline --decorate
-            git commit -m "Rename XXX.* newsfragments to PR number"
+            git log --oneline --decorate
+            git commit -m "Rename XXX.* newsfragments to PR ${{github.event.number}}/*"
             # git remote -v
             # git branch -a
             # cat .git/config
             git push fork HEAD:"${HEAD_BRANCH}"
           else
             echo "No Newsfragments need to be renamed."
-          fi
-      - name: Added a newsfragment
-        run: |
-          set -x
-          git fetch --unshallow
-          git log HEAD -n 1
-          # echo "_$(git diff ${{ github.event.pull_request.base.sha }} --name-only -- newsfragments/)_"
-          treediff="$(git diff-tree  HEAD ${{ github.event.pull_request.base.sha }} -- newsfragments/)"
-          echo "_${treediff}_"
-          if [[ -z "${treediff}" ]]; then
-            echo "::error ::PR Branch is missing a newsfragment. Please add one with a number or named XXX.<type>."
-            exit 1
-          else
-            echo "✅  Newsfragment entry present"
-            find .
           fi
       # - name: Push changes
       #   uses: ad-m/github-push-action@master
