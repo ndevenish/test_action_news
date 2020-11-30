@@ -30,6 +30,7 @@ jobs:
           fi
       - name: Rename placeholder newsfragments
         run: |
+          set -x
           if ls newsfragments/XXX.* 1> /dev/null 2>&1; then
             # Setup SSH access
             mkdir -p ~/.ssh
