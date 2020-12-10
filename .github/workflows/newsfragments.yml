@@ -14,7 +14,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v2
         with:
-          # ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha }}
           token: ${{ secrets.USER_TOKEN }}
       - name: Added a newsfragment
         run: |
@@ -23,7 +23,7 @@ jobs:
           git fetch --unshallow
           git log HEAD -n 1
           git log $GITHUB_SHA -n 1
-          treediff="$(git diff-tree  HEAD ${{ github.event.pull_request.base.sha }} -- newsfragments/)"
+          treediff="$(git diff --name-status $(git merge-base ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }}) ${{ github.event.pull_request.head.sha }} -- newsfragments/ | grep '^A')"
           if [[ -z "${treediff}" ]]; then
             echo "::error ::PR Branch is missing a newsfragment. Please add one with a number or named XXX.<type>."
             exit 1
