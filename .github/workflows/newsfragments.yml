@@ -33,7 +33,7 @@ jobs:
         run: |
           if ls newsfragments/XXX.* 1> /dev/null 2>&1; then
             TOKEN="${USER_TOKEN:-${GITHUB_TOKEN}}"
-            echo "Using token $( echo -n $TOKEN | md5sum )
+            echo "Using token $( echo -n $TOKEN | md5sum )"
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             HEAD_REPO="${{github.event.pull_request.head.repo.full_name}}"
