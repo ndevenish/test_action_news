@@ -18,12 +18,13 @@ jobs:
           token: ${{ secrets.USER_TOKEN }}
       - name: Added a newsfragment
         run: |
+          export BASH_XTRACEFD=1
           set -x
           echo "Triggering commit: ${GITHUB_REF} ${GITHUB_SHA}"
           git fetch --unshallow
           git log HEAD -n 1
-          git log $GITHUB_SHA -n 1
-          treediff="$(git diff --name-status $(git merge-base ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }}) ${{ github.event.pull_request.head.sha }} -- newsfragments/ | grep '^A')"
+          commit_merge_base="$(git merge-base ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }})"
+          treediff="$(git diff --name-status $commit_merge_base ${{ github.event.pull_request.head.sha }} -- newsfragments/ | grep '^A' )"
           if [[ -z "${treediff}" ]]; then
             echo "::error ::PR Branch is missing a newsfragment. Please add one with a number or named XXX.<type>."
             exit 1
