@@ -31,12 +31,13 @@ jobs:
       - name: Rename placeholder newsfragments
         run: |
           if ls newsfragments/XXX.* 1> /dev/null 2>&1; then
+            TOKEN="${USER_TOKEN:-${GITHUB_TOKEN}}"
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             HEAD_REPO="${{github.event.pull_request.head.repo.full_name}}"
             HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
             message=""
-            git remote add fork https://x-access-token:${GITHUB_TOKEN}@github.com/$HEAD_REPO.git
+            git remote add fork https://x-access-token:${TOKEN}@github.com/$HEAD_REPO.git
             for fragment in newsfragments/XXX.*; do
               target_file="$(echo "${fragment}" | sed "s/XXX/${{github.event.number}}/")"
               git mv $fragment $target_file
