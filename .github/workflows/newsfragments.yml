@@ -45,6 +45,10 @@ jobs:
             git remote add fork https://x-access-token:${USER_TOKEN}@github.com/$HEAD_REPO.git
             for fragment in ${rename_candidates}; do
               target_file="$(echo "${fragment}" | sed -E "s/[xX]+/${{github.event.number}}/")"
+              if [[ -f "${target_file}" ]]; then
+                echo "::error ::Cannot rename ${fragment} to ${target_file} as it already exists. Merge manually."
+                exit 1
+              fi
               git mv $fragment $target_file
               git add $target_file
               if [[ -z "${message}" ]]; then
