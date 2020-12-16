@@ -34,6 +34,7 @@ jobs:
           fi
       - name: Rename placeholder newsfragments
         run: |
+          set -x
           rename_candidates="$(find newsfragments -regex 'newsfragments/[xX]+\..*')"
           if [[ -n "$rename_candidates" ]]; then
             git config user.name "DiamondLightSource-build-server"
